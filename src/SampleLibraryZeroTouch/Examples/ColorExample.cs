@@ -8,7 +8,7 @@ namespace Examples
         private CustomRenderExample(){}
 
         /// <summary>
-        /// Create an object which renders custom geometry.
+        /// 静态构造器
         /// </summary>
         public static CustomRenderExample Create()
         {
@@ -18,23 +18,22 @@ namespace Examples
         [IsVisibleInDynamoLibrary(false)]
         public void Tessellate(IRenderPackage package, TessellationParameters parameters)
         {
-            // Dynamo's renderer uses IRenderPackage objects
-            // to store data for rendering. The Tessellate method
-            // give you an IRenderPackage object which you can fill
-            // with render data.
+            //实现IGraphicItem接口中的方法,该方法用于几何体绘制.
+            //形参中的IRenderPackage对象可以用来填充渲染数据,
 
-            // Set RequiresPerVertexColoration to let the renderer
-            // know that you needs to use a per-vertex color shader.
-            package.RequiresPerVertexColoration = true;
+            package.RequiresPerVertexColoration = true;//逐节点着色模式
 
-            AddColoredQuadToPackage(package);
-            AddColoredLineToPackage(package);
+            AddColoredQuadToPackage(package);//画两个三角形
+            AddColoredLineToPackage(package);//划线
         }
-
+        /// <summary>
+        /// 填充顶点信息:两个三角形
+        /// </summary>
+        /// <param name="package"></param>
         private static void AddColoredQuadToPackage(IRenderPackage package)
         {
             // Triangle 1
-            package.AddTriangleVertex(0, 0, 0);
+            package.AddTriangleVertex(5, 0, 0);
             package.AddTriangleVertex(1, 0, 0);
             package.AddTriangleVertex(1, 1, 0);
 
@@ -65,7 +64,10 @@ namespace Examples
             package.AddTriangleVertexUV(0, 0);
             package.AddTriangleVertexUV(0, 0);
         }
-
+        /// <summary>
+        /// 填充顶点信息:一条线段
+        /// </summary>
+        /// <param name="package"></param>
         private static void AddColoredLineToPackage(IRenderPackage package)
         {
             package.AddLineStripVertex(0,0,0);

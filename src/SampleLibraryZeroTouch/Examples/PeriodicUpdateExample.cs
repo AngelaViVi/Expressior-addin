@@ -12,6 +12,13 @@ namespace Examples
     // requires a parameter, 't', that is incremented during each run. 
     // This example also demonstrates how to use trace to store data that
     // you want to carry over between evaluations.
+
+    ///这个实例用来演示如何使用CanUpdatePeriodically attribute
+    /// 
+
+    /// <summary>
+    /// 
+    /// </summary>
     public class  PeriodicUpdateExample : IGraphicItem
     {
         private Point[,] vertexCoords;

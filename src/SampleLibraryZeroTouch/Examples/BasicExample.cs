@@ -8,43 +8,37 @@ using Autodesk.DesignScript.Runtime;
 namespace Examples
 {
     /// <summary>
-    /// The HelloDynamoZeroTouch class demonstrates
-    /// how to create a class in a zero touch library
-    /// which creates geometry, and exposes public 
-    /// methods and properties as nodes.
+    /// 注意:构建的dll在被加载到程序中后,会在控件箱中形成若干层目录和一些节点.
+    /// 其中工程名是一层目录,命名空间是一层目录,类名是最后一层目录,类中的可见元素是节点
+    /// publiuc的Properties和函数会显示成节点,函数的参数和返回值分别对应节点的输入和输出端口
+    /// 
     /// </summary>
     public class BasicExample : IGraphicItem
     {
-         //OPTIONAL:
-         //IGraphicItem is an interface which allows your
-         //class to participate in the rendering of geometry
-         //to the background preview, and to Watch3D nodes.
-         //You do not need to implement IGraphicItem unless
-         //your node needs to draw geometry to the view.
-        
+
+        /*
+         * IGraphicItem接口是用来向Watch3D绘图的,如果自定义节点不需要绘图则无需实现这个接口
+         */
         private Point point;
 
-         //--------------------------------------------------
-         //A NOTE ON XML COMMENTS:
-         
-         //Dynamo uses the comments you've put on your code to 
-         //populate tooltips and help windows in the user 
-         //interface. In order to enable this behavior, your 
-         //project needs to be set to build xml 
-         //documentation. To do this:
-         //1. Right click on your project in the solution explorer.
-         //2. Select Properties.
-         //3. Select the Build tab. 
-         //4. Check the XML Documentation box.
-        
-         //The generated xml file will be called the same
-         //thing as your library, and needs to live along-side
-         //your library to be picked up by the Dynamo loader.
-         //--------------------------------------------------
-        
+
+        ///-------------------------------------------------------------
+        ///关于XML注释:
+        /// 如果你对类和方法进行了xml注释(即方法头自动注释),
+        /// 注释的内容将会以TOP Tips的形式显示在界面上.
+        ///
+        /// 为了实现这个效果,你需要这样操作:
+        /// 1.在解决方案管理器中右击项目节点
+        /// 2.选择属性
+        /// 3.选择生成
+        /// 4.勾选XML文档的checkbox
+        ///
+        /// 生成的xml必须在dll旁边并且叫相同的名字
+        /// -------------------------------------------------------------
+
+
         /// <summary>
-        /// Properties marked as public will show up as 
-        /// nodes in the Query section of the dynamo library.
+        /// Public 的 Properties 会显示为Node
         /// </summary>
         public double Awesome { get { return 42.0; } }
 
@@ -52,16 +46,14 @@ namespace Examples
         /// The Point stored on the object.
         /// </summary>
         public Point Point { get { return point; } }
-            
+
         /// <summary>
-        /// Properties and methods marked as internal will not
-        /// be visible in the Dynamo UI.
+        /// internal的Properties和函数不会出现在UI上
         /// </summary>
         internal double InvisibleProperty { get { return 42.0; } }
 
         /// <summary>
-        /// Private methods, such as this constructor,
-        /// will not be visible in the Dynamo library.
+        /// Private 函数不显示
         /// </summary>
         /// <param name="x">The x coordinate.</param>
         /// <param name="y">The y coordinate.</param>
@@ -72,12 +64,9 @@ namespace Examples
         }
 
         /// <summary>
-        /// Dynamo uses the pattern of static constructors.
-        /// Don't forget to fill in the xml comments so that
-        /// you will get help tips in the UI. You can also use
-        /// default parameters, as we have here. With default
-        /// parameters defined, you will not be required to attach
-        /// any inputs to these ports in Dynamo.
+        /// 使用静态构造器
+        /// 如果使用了默认函数,就不必给节点的输入端口连接其他节点.
+        /// 如果填充了xmlcomments,节点会具备Top Tips.
         /// </summary>
         /// <param name="x">The x coordinate of the point.</param>
         /// <param name="y">The y coordinate of the point.</param>
@@ -85,15 +74,10 @@ namespace Examples
         /// <returns>A HelloDynamoZeroTouch object.</returns>
         public static BasicExample Create(double x=42.0, double y=42.0, double z=42.0)
         {
-            // Let's say in our example that the user is not allowed
-            // to create an instance of this class if any of the 
-            // coordinates is less than zero. We check the parameters
-            // here because passing to the private constructor, and
-            // we throw an error if the parameters do not conform.
-
-            // These exceptions will be shown in the error bubble
-            // over the node, and the node will turn yellow.
-
+            /*
+             * 抛出ArgumentException异常将会阻止图的运行和实例化,并且节点会变成黄色
+             * 上边会出现话泡,并显示出异常信息
+             */
             if (x < 0)
             {
                 throw new ArgumentException("x");
@@ -113,9 +97,7 @@ namespace Examples
         }
 
         /// <summary>
-        /// Another example of a static constructor which
-        /// uses a parameter with a default value. The default value
-        /// is provided as a design script expression.
+        /// 如果参数不是基本类型,要给出默认参数的话,可以使用这种写法
         /// </summary>
         /// <param name="point">A point.</param>
         /// <returns>A BasicExample object.</returns>
@@ -124,11 +106,17 @@ namespace Examples
             return new BasicExample(point.X, point.Y, point.Z);
         }
 
+        public int Calculator(int a, int b)
+        {
+            return a + b;
+        }
+        public static int StaticCalculator(int a, int b)
+        {
+            return a + b;
+        }
         /// <summary>
-        /// The MultiReturn attribute can be used to specify
-        /// the names of multiple output ports on a node that 
-        /// returns a dictionary. The node must return a dictionary
-        /// to be recognized as a multi-out node.
+        /// 如果一个节点要返回多个值,就把返回类型设为Dictionary
+        /// 并在前面标记MultiReturn Attribute,Attribute参数是两个返回端口的名称
         /// </summary>
         /// <returns></returns>
         [MultiReturn(new[] { "thing 1", "thing 2" })]
@@ -142,13 +130,8 @@ namespace Examples
         }
 
         /// <summary>
-        /// OPTIONAL:
-        /// Overriding ToString allows you to control what is
-        /// displayed whenever the object's string representation
-        /// is used. For example, ToString is called when the 
-        /// object is displayed in a Watch node.
+        /// 当节点被连接到Watch节点上时,有可能会调用ToString,重写这个函数可以指定这种情况下输出的是什么
         /// </summary>
-        /// <returns>The string representation of our object.</returns>
         public override string ToString()
         {
             return string.Format("HelloDynamoZeroTouch:{0},{1},{2}", point.X, point.Y, point.Z);
@@ -157,9 +140,7 @@ namespace Examples
         #region IGraphicItem interface
 
         /// <summary>
-        /// The Tessellate method in the IGraphicItem interface allows
-        /// you to specify what is drawn when dynamo's visualization is
-        /// updated.
+        /// 填充package可以绘图.兼容IGraphicItem的类对象可以被解释成几何体从而在Watch 3D 中绘制
         /// </summary>
         [IsVisibleInDynamoLibrary(false)]
         public void Tessellate(IRenderPackage package, TessellationParameters parameters)
@@ -173,27 +154,17 @@ namespace Examples
     }
 
     /// <summary>
-    /// By decorating a class with the 
-    /// IsVisibleInDynamoLibrary attribute, and setting
-    /// it to false, you are saying that you want this member
-    /// to be available to the VM, but not be visible in the
-    /// library view or search.
+    /// 使用IsVisibleInDynamoLibrary attribute标注一个类并设置为false,
+    /// 意味着这个类可以被VM中的其他类所依赖,但是不会显示为一个节点目录.
     ///
-    /// By decorating a class with the SupressImportIntoVM
-    /// attribute, you are saying that you do not want to import
-    /// this class into Dynamo. BE CAREFUL! This class will then
-    /// be unavailable to others that might reference it. In most
-    /// cases, adding IsVisibleInDynamoLibrary(false) will suffice 
-    /// to hide your method from view without needing to disable
-    /// its import completely.
+    /// 使用SupressImportIntoVM attribute标注一个类,
+    /// 意味着这个类不会被导入到VM中,对于其他依赖与这个类的方法和类,这个类将不可见.
+    /// 例如测试类,就可以这样写
     /// </summary>
     [SupressImportIntoVM]
     [IsVisibleInDynamoLibrary(false)]
     public class DoesNotImportClass
     {
-        /// <summary>
-        /// DoesNotImportClass constructor.
-        /// </summary>
         public DoesNotImportClass(){}
     }
 }
