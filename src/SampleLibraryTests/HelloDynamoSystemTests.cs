@@ -9,6 +9,10 @@ using NUnit.Framework;
 
 namespace SampleLibraryTests
 {
+    /*
+     * 注意这个工程的默认输出目录是:..\..\..\Dynamo\bin\AnyCPU\Debug\
+     * 直接注入到隔壁的输出目录下,这是第三个加载位置.
+     */
     /// <summary>
     /// HelloDynamoSystemTests is a test fixture that contains
     /// system tests for Dynamo. System tests test the entire 
